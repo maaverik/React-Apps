@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>TweetBox</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.1/react.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.1/react-dom.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.16/browser.js"></script>
+</head>
+<body>
+<div id="container"></div>
+<script type="text/babel">
+	var TweetBox = React.createClass({
+		getInitialState: function(){
+			return ({text:"",
+				photo: false
+			});
+		},
+		handleChange: function(event){
+			//console.log(event.target.value);
+			this.setState({text: event.target.value});
+		},
+		toggle: function(event){
+			this.setState({photo: !this.state.photo});
+		},
+		remainingCharacters: function() {
+			if (this.state.photo) {
+				return 70 - 23 - this.state.text.length;
+			}
+			else {
+				return 70 - this.state.text.length;
+			}
+		},
+		overFlowAlert: function() {
+			if (this.remainingCharacters() < 0) {
+				if (this.state.photo) {
+					var beforeOverflowText = this.state.text.substring(70 - 23 - 10, 70 - 23);
+					var overflowText = this.state.text.substring(70 - 23);
+				}
+				else {
+					var beforeOverflowText = this.state.text.substring(70 - 10, 70);
+					var overflowText = this.state.text.substring(70);
+				}
+				return (
+					<div className="alert alert-warning">
+						<strong>Oops! Too Long:</strong>
+						&nbsp;...{beforeOverflowText}
+						<strong className="bg-danger">{overflowText}</strong>
+					</div>
+				);
+			}
+			else {
+				return "";
+			}
+		},
+		characters: function(){
+			if (this.remainingCharacters() >= 0){
+				return(
+					<span>{this.remainingCharacters()} more characters allowed</span>
+				);
+			}
+			else{
+				return "";
+			}
+		},
+		render: function() {
+			return (
+				<div className="well clearfix">
+					{this.overFlowAlert()}
+					<textarea className="form-control" onChange={this.handleChange}></textarea>
+					<br/>
+					{this.characters()}
+			{/*
+			event handling functions don't need () , others do
+			*/}
+					<button className="btn btn-primary pull-right" disabled={this.remainingCharacters() === 70 || this.remainingCharacters() < 0}>
+					Tweet</button>
+					<button className="btn btn-default pull-right" onClick={this.toggle} title="Adds 23 characters">{this.state.photo ? "Photo added" : "Add photo"}</button>
+				</div>
+			);
+		}
+	});
+
+	ReactDOM.render(
+		<TweetBox />,
+		document.getElementById("container")
+	);
+</script>
+</body>
+</html>
