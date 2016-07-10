@@ -13,27 +13,28 @@
 		{key: 1, name: "John Smith", email: "john@johnandsmith.com", description: "Sales Dept;  Cell: 7459633286"},
 		{key: 2, name: "Jim", email: "jim@qwerty.com", description:''},
 	];
-
+	var Key = 3;
 	var Contact = React.createClass({
-		deleteContact: function() {
+		deleteContact() {
 			this.props.Delete(this.props.contact);
 		},
-		contactEdit: function() {
+		contactEdit() {
 			this.props.Edit(this.props.contact);
 		},
-		render: function(){
+		render(){
 			return (<div>
 					<h2>{this.props.contact.name}</h2>
 					<a href='mailto:{this.props.contact.email}'>{this.props.contact.email}</a>
 					<p>{this.props.contact.description}</p>
 					<button onClick={this.contactEdit}> Edit </button>
 					<button onClick={this.deleteContact}> Delete </button>
-				</div>);
+				</div>
+			);
 		}
 	});
 
 	var ContactList = React.createClass({
-		render: function(){
+		render(){
 			var self=this; 		//To avoid error with 'this' inside map function
 			return(
 				<ul>
@@ -49,25 +50,26 @@
 	});
 
 	var ContactForm = React.createClass({
-		getInitialState: function(){
+		getInitialState(){
 			return{
+				key: "",
 				name:"",
 				email:"",
 				description:"",
 				buttonText: 'Add Contact',
 			};
 		},
-		Editing:  false,
-		nameChange: function(event){
+		Editing: false,
+		nameChange(event){
 			this.setState({name:event.target.value});
 		},
-		emailChange: function(event){
+		emailChange(event){
 			this.setState({email:event.target.value});
 		},
-		descChange: function(event){
+		descChange(event){
 			this.setState({description:event.target.value});
 		},
-		contactSubmit: function(event){
+		contactSubmit(event){
 			event.preventDefault();
 			if (!this.Editing){
 				var name = this.state.name.trim();
@@ -75,25 +77,27 @@
 				if (!name || !email) {
 					return;
 				}
-				this.props.Submit({name:this.state.name, email:this.state.email, description:this.state.description,});
+				this.props.Submit({key:Key, name:this.state.name, email:this.state.email, description:this.state.description,});
+				Key++;
 			}
 			else{
-				this.props.SubmitEdit({name:this.state.name, email:this.state.email, description:this.state.description,});
+				this.props.SubmitEdit({key:this.state.key, name:this.state.name, email:this.state.email, description:this.state.description,});
 				this.Editing = false;
 			}
-			this.setState({name:"",email:"",description:"",buttonText:"Add contact"});
+			this.setState({key:"", name:"",email:"",description:"",buttonText:"Add contact"});
 		},
-		contactEdit: function(){
+		contactEdit(){
 			this.Editing = true;
 			this.setState({
+					key: this.props.EditContact.key,
 					name:this.props.EditContact.name,
 					email:this.props.EditContact.email,
 					description:this.props.EditContact.description,
 					buttonText: 'Edit Contact',
 			});
 		},
-		render: function(){
-			if (Object.keys(this.props.EditContact).length > 0 && (this.state.name !== this.props.EditContact.name && this.state.email !== this.props.EditContact.email)) {
+		render(){
+			if (Object.keys(this.props.EditContact).length > 0 && (this.state.key !== this.props.EditContact.key)) {
 				this.contactEdit();
 			}
 			return(
@@ -108,19 +112,19 @@
 	})
 
 	var Root = React.createClass({
-		getInitialState: function(){
+		getInitialState(){
 			return {Contacts:Contacts, EditContact:{}};
 		},
-		Submit: function(contact) {
+		Submit(contact) {
 			Contacts.push(contact);
 			this.setState({Contacts:Contacts});
 		},
-		Edit: function (contact) {
+		Edit(contact) {
 			this.setState({EditContact:contact});
 		},
-		SubmitEdit: function(contact){
+		SubmitEdit(contact){
 			var self = this;
-			Contacts = Contacts.map(function(cntct){		//Fix this
+			Contacts = Contacts.map(function(cntct){
 				if (cntct === self.state.EditContact){
 					return contact;
 				}
@@ -131,13 +135,13 @@
 			this.setState({Contacts:Contacts});
 			this.setState({EditContact:{}});
 		},
-		Delete: function(contact) {
+		Delete(contact) {
 			Contacts = Contacts.filter(function(cntct){
 				return cntct !== contact;
 			});
 			this.setState({Contacts:Contacts});
 		},
-		render:function(){
+		render(){
 			return(
 				<div>
 				<h1>Contacts</h1>
